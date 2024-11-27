@@ -13,43 +13,52 @@ function Login(props) {
                 password,
             });
             console.log(resp.data);
-            props.setisConect(true);
+            localStorage.setItem("token", resp.data.token); 
+            localStorage.setItem("first", resp.data.user.first_name);
+            localStorage.setItem("last", resp.data.user.last_name);
+            props.setisConect(true); 
         } catch (err) {
-            console.log(err);
+            console.error("Login error:", err.response ? err.response.data : err.message);
+            alert("Login failed. Please check your credentials.");
         }
     };
 
     return (
-        <div>
-            <form onSubmit={Submit}>
-                <label htmlFor="cin">CIN</label>
-                <br />
-                <input
-                    type="text"
-                    id="cin"
-                    value={cin}
-                    onChange={(e) => {
-                        setCin(e.target.value);
-                    }}
-                />
-                <br />
-                <br />
-                <label htmlFor="password">Password</label>
-                <br />
-                <input
-                    type="password"
-                    id="password"
-                    value={password}
-                    onChange={(e) => {
-                        setPassword(e.target.value);
-                    }}
-                />
-                <br />
-                <br />
-                <button type="submit" onClick={Submit}>
-                    Login
-                </button>
-            </form>
+        <div className="container d-flex justify-content-center align-items-center vh-100">
+            <div className="card p-4 shadow" style={{ width: "25rem" }}>
+                <h3 className="text-center mb-4">Login</h3>
+                <form onSubmit={Submit}>
+                    <div className="mb-3">
+                        <label htmlFor="cin" className="form-label">
+                            CIN
+                        </label>
+                        <input
+                            type="text"
+                            id="cin"
+                            className="form-control"
+                            value={cin}
+                            onChange={(e) => setCin(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="password" className="form-label">
+                            Password
+                        </label>
+                        <input
+                            type="password"
+                            id="password"
+                            className="form-control"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <button type="submit" className="btn btn-primary w-100">
+                        Login
+                    </button>
+                </form>
+            </div>
         </div>
     );
 }
