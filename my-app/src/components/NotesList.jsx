@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 
-function NotesList() {
+function NotesList(props) {
     const [notes, setNotes] = useState([]);
     const [userName, setUserName] = useState("");
     const [userLast, setLast] = useState("");
@@ -77,14 +77,30 @@ function NotesList() {
         }
     };
 
+    const logout = async () => {
+
+        try {
+            const resp = await axios.post('https://notes.devlop.tech/api/logout', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            console.log(resp.data);
+            localStorage.removeItem('token');
+            props.setisConect(false);
+
+        }
+        catch (err) {
+            console.error(err.response?.data || err.message);
+        }
+    }
+
     return (
         <div className="container mt-5 ">
             <h1 className="text-center mb-4">Notes List</h1>
             <h4>Welcome, {userName} {userLast}</h4>
             <div className="mb-3 d-flex justify-content-between">
-                <button className="btn btn-danger" onClick={() => {
-                    alert('Hatin tochkan sber ka')
-                }}>Log Out</button>
+                <button className="btn btn-danger" onClick={()=>{alert('khdamin 3liha')}}>Log Out</button>
 
                 <button className="btn btn-success" onClick={() => {
                     alert('Hatin tochkan sber ka')

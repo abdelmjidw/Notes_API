@@ -6,7 +6,7 @@ function App() {
   const [isConect, setisConect] = useState(false);
 
   return (
-    <div>{isConect ? <NotesList /> : <Login setisConect={setisConect} />}</div>
+    <div>{isConect ? <NotesList setisConect={setisConect}/> : <Login setisConect={setisConect} />}</div>
   );
 }
 
