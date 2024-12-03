@@ -9,6 +9,9 @@ function NotesList() {
     const [editTitle, setEditTitle] = useState("");
     const [editContent, setEditContent] = useState("");
 
+    const token = localStorage.getItem("token");
+
+
     useEffect(() => {
         fetchNotes();
         const storedName = localStorage.getItem("first");
@@ -20,13 +23,14 @@ function NotesList() {
     }, []);
 
     const fetchNotes = async () => {
+
         try {
-            const token = localStorage.getItem("token");
             const resp = await axios.get('https://notes.devlop.tech/api/notes', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
+
             setNotes(resp.data);
         } catch (err) {
             console.error("Error fetching notes:", err.response ? err.response.data : err.message);
@@ -36,14 +40,14 @@ function NotesList() {
 
     const delet = async (noteId) => {
         try {
-            const token = localStorage.getItem('token');
+
             await axios.delete(`https://notes.devlop.tech/api/notes/${noteId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
             setNotes((prevNotes) => prevNotes.filter((note) => note.id !== noteId));
-        
+
         } catch (err) {
             console.error("Error deleting note:", err.response ? err.response.data : err.message);
             alert("Failed to delete the note. Please try again.");
@@ -52,7 +56,6 @@ function NotesList() {
 
     const updateNote = async (noteId, updatedData) => {
         try {
-            const token = localStorage.getItem("token");
             await axios.put(
                 `https://notes.devlop.tech/api/notes/${noteId}`,
                 updatedData,
@@ -67,7 +70,7 @@ function NotesList() {
                     note.id === noteId ? { ...note, ...updatedData } : note
                 )
             );
-         
+
         } catch (err) {
             console.error("Error updating note:", err.response ? err.response.data : err.message);
             alert("Failed to update the note. Please try again.");
@@ -77,24 +80,25 @@ function NotesList() {
     return (
         <div className="container mt-5 ">
             <h1 className="text-center mb-4">Notes List</h1>
-            <h4>Welcome, {userName} {userLast}</h4> 
+            <h4>Welcome, {userName} {userLast}</h4>
             <div className="mb-3 d-flex justify-content-between">
-                <button className="btn btn-danger" onClick={()=>{
+                <button className="btn btn-danger" onClick={() => {
                     alert('Hatin tochkan sber ka')
                 }}>Log Out</button>
 
-                <button className="btn btn-success" onClick={()=>{
+                <button className="btn btn-success" onClick={() => {
                     alert('Hatin tochkan sber ka')
                 }}>Add New Note</button>
             </div>
             {notes.length > 0 ? (
                 <table className="table table-striped table-bordered">
-                    <thead className="table-dark">
+                    <thead className="table-dark text-center">
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Title</th>
                             <th scope="col">Content</th>
-                            <th>Events</th>
+                            <th scope="col">shared_with</th>
+                            <th scope="col">Events</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -103,7 +107,15 @@ function NotesList() {
                                 <tr key={index}>
                                     <th scope="row">{index + 1}</th>
                                     <td>{note.title}</td>
-                                    <td>{note.content}</td>
+                                    <td> <b>{note.content}</b>  <small className="text-muted"> {new Date(note.date).toLocaleDateString('en-GB')}
+                                    </small></td>
+                                    <td >
+                                        {note.shared_with && note.shared_with.length > 0
+                                            ? note.shared_with.map((user) => user.first_name).join(", ")
+                                            : "Not shared"}
+                                    </td>
+
+
                                     <td>
                                         <div className="d-flex justify-content-start gap-1">
                                             <button
