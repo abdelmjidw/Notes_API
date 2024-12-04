@@ -3,23 +3,31 @@ import React, { useEffect, useState } from "react";
 
 function NotesList(props) {
     const [notes, setNotes] = useState([]);
+    const [users, setUsers] = useState([]);
     const [userName, setUserName] = useState("");
     const [userLast, setLast] = useState("");
     const [editingNote, setEditingNote] = useState(null);
     const [editTitle, setEditTitle] = useState("");
     const [editContent, setEditContent] = useState("");
+    const [newTitle, setNewTitle] = useState("");
+    const [newContent, setNewContent] = useState("");
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [newSharedWith, setNewSharedWith] = useState([]);
+
 
     const token = localStorage.getItem("token");
 
 
     useEffect(() => {
         fetchNotes();
+        fetchUsers();
         const storedName = localStorage.getItem("first");
         const storedlast = localStorage.getItem("last");
         if (storedName && storedlast) {
             setUserName(storedName);
             setLast(storedlast);
         }
+
     }, []);
 
     const fetchNotes = async () => {
@@ -37,6 +45,44 @@ function NotesList(props) {
             alert("Failed to fetch notes. Please try again.");
         }
     };
+    const fetchUsers = async () => {
+        try {
+            const resp = await axios.get("https://notes.devlop.tech/api/users", {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setUsers(resp.data);
+        } catch (err) {
+            console.error("Error fetching users:", err.response?.data || err.message);
+            alert("Failed to fetch users. Please try again.");
+        }
+    };
+
+
+    const addNote = async () => {
+        try {
+            const newNote = {
+                title: newTitle,
+                content: newContent,
+                shared_with: newSharedWith,
+            };
+            const resp = await axios.post("https://notes.devlop.tech/api/notes", newNote, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setNotes([...notes, resp.data]);
+            setNewTitle("");
+            setNewContent("");
+            setNewSharedWith([]);
+            setShowAddForm(false);
+        } catch (err) {
+            console.error("Error adding note:", err.response?.data || err.message);
+            alert("Failed to add note. Please try again.");
+        }
+    };
+
 
     const delet = async (noteId) => {
         try {
@@ -99,12 +145,77 @@ function NotesList(props) {
         <div className="container mt-5 ">
             <h1 className="text-center mb-4">Notes List</h1>
             <h4>Welcome, {userName} {userLast}</h4>
-            <div className="mb-3 d-flex justify-content-between">
-                <button className="btn btn-danger" onClick={()=>{alert('khdamin 3liha')}}>Log Out</button>
-
-                <button className="btn btn-success" onClick={() => {
-                    alert('Hatin tochkan sber ka')
-                }}>Add New Note</button>
+            <div className="mb-3 d-flex justify-content-center" >
+                <div className="d-flex gap-1">
+                    <button className="btn btn-danger" onClick={() => { alert('khdamin 3liha') }}>Log Out</button>
+                    <button className="btn btn-success" onClick={() => setShowAddForm(!showAddForm)}>{showAddForm ? "Cancel" : "Add New Note"}</button>
+                </div>  {showAddForm && (
+                    <div className="card mt-2 p-4 shadow-sm  ">
+                        <h5 className="card-title mb-3">Add New Note</h5>
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                addNote();
+                            }}
+                        >
+                            <div className="mb-3">
+                                <label htmlFor="newTitle" className="form-label">
+                                    Title
+                                </label>
+                                <input
+                                    type="text"
+                                    id="newTitle"
+                                    className="form-control"
+                                    value={newTitle}
+                                    onChange={(e) => setNewTitle(e.target.value)}
+                                    placeholder="Enter note title"
+                                    required
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <label htmlFor="newContent" className="form-label">
+                                    Content
+                                </label>
+                                <textarea
+                                    id="newContent"
+                                    className="form-control"
+                                    value={newContent}
+                                    onChange={(e) => setNewContent(e.target.value)}
+                                    placeholder="Enter note content"
+                                    rows="4"
+                                    required
+                                ></textarea>
+                            </div>
+                            <div className="mb-3">
+                                <label htmlFor="newSharedWith" className="form-label">
+                                    Share With
+                                </label>
+                                <select
+                                    id="newSharedWith"
+                                    className="form-select"
+                                    value={newSharedWith}
+                                    onChange={(e) =>
+                                        setNewSharedWith(
+                                            Array.from(e.target.selectedOptions, (option) => option.value)
+                                        )}
+                                    multiple
+                                >
+                                    {users.map((user) => (
+                                        <option key={user.id} value={user.id}>
+                                            {user.first_name} {user.last_name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <small className="text-muted">
+                                    Hold down the Ctrl (Windows) or Command (Mac) key to select multiple people.
+                                </small>
+                            </div>
+                            <button type="submit" className="btn btn-primary w-100">
+                                Save Note
+                            </button>
+                        </form>
+                    </div>
+                )}
             </div>
             {notes.length > 0 ? (
                 <table className="table table-striped table-bordered">
