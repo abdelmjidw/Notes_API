@@ -126,13 +126,13 @@ function NotesList(props) {
     const logout = async () => {
 
         try {
-            const resp = await axios.post('https://notes.devlop.tech/api/logout', {
+            const resp = await axios.post('https://notes.devlop.tech/api/logout', {}, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
             console.log(resp.data);
-            localStorage.removeItem('token');
+            localStorage.removeItem('token'); 
             props.setisConect(false);
 
         }
@@ -147,7 +147,7 @@ function NotesList(props) {
             <h4>Welcome, {userName} {userLast}</h4>
             <div className="mb-3 d-flex justify-content-center" >
                 <div className="d-flex gap-1">
-                    <button className="btn btn-danger" onClick={() => { alert('khdamin 3liha') }}>Log Out</button>
+                    <button className="btn btn-danger" onClick={logout}>Log Out</button>
                     <button className="btn btn-success" onClick={() => setShowAddForm(!showAddForm)}>{showAddForm ? "Cancel" : "Add New Note"}</button>
                 </div>  {showAddForm && (
                     <div className="card mt-2 p-4 shadow-sm  ">

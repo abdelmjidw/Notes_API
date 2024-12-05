@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { Alert } from "react-bootstrap";
 
 function Login(props) {
     const [cin, setCin] = useState("");
     const [password, setPassword] = useState("");
+    const [Forgeted, setForgeted] = useState(false);
 
     const Submit = async (e) => {
         e.preventDefault();
@@ -13,14 +15,18 @@ function Login(props) {
                 password,
             });
             console.log(resp.data);
-            localStorage.setItem("token", resp.data.token); 
+            localStorage.setItem("token", resp.data.token);
             localStorage.setItem("first", resp.data.user.first_name);
             localStorage.setItem("last", resp.data.user.last_name);
-            props.setisConect(true); 
+            props.setisConect(true);
         } catch (err) {
             console.error("Login error:", err.response ? err.response.data : err.message);
             alert("Login failed. Please check your credentials.");
         }
+    };
+
+    const Forget = () => {
+        !Forgeted?setForgeted(true):setForgeted(false);
     };
 
     return (
@@ -58,6 +64,14 @@ function Login(props) {
                         Login
                     </button>
                 </form>
+                <a href="#" className="text-center mt-2" onClick={Forget}>
+                {!Forgeted ? "Forget Password" : "Safi tfkrto"}
+                </a>
+                {Forgeted && (
+                    <Alert variant="success" className="mt-3 text-center">
+                        JAREB 123456 ILA MSD9ATCH M3NDI MNDIR LIK
+                    </Alert>
+                )}
             </div>
         </div>
     );
